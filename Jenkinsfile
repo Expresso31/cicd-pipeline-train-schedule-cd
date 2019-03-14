@@ -13,7 +13,7 @@ pipeline {
                 branch 'master'
             }
             steps {
-                withCredentials([usernamePassword(credentialsId: 'staging-prod', usernameVar: 'USERNAME', passwordVar: 'USERPASS' )])
+                withCredentials([usernamePassword(credentialsId: 'staging-prod', usernameVariable: 'USERNAME', passwordVariable: 'USERPASS' )])
                 sshPublisher(
                     failOnError: true,
                     continueOnError: false,
@@ -45,13 +45,13 @@ pipeline {
             steps {
                 input 'Does staging look okay'
                 milestone(1)
-                withCredentials([usernamePassword(credentialsId: 'staging-prod', usernameVar: 'USERNAME', passwordVar: 'USERPASS' )])
+                withCredentials([usernamePassword(credentialsId: 'staging-prod', usernameVariable: 'USERNAME', passwordVariable: 'USERPASS' )])
                 sshPublisher(
                     failOnError: true,
                     continueOnError: false,
                     publishers:[
                         sshPublisherDesc(
-                            configName: 'staging',
+                            configName: 'Staging-Prod',
                             sshCredentials: [
                             username: "$USERNAME",
                             encryptedPassphrase: "$USERPASS"
