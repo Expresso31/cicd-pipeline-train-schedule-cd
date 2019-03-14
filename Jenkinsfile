@@ -13,29 +13,29 @@ pipeline {
                 branch 'master'
             }
             steps {
-                withCredentials([usernamePassword(credentialsId: 'staging-prod', usernameVariable: 'USERNAME', passwordVariable: 'USERPASS' )])
-                sshPublisher(
-                    failOnError: true,
-                    continueOnError: false,
-                    publishers:[
-                        sshPublisherDesc(
-                            configName: 'Staging-Prod',
-                            sshCredentials: [
-                            username: "$USERNAME",
-                            encryptedPassphrase: "$USERPASS"
-                            ],
+                withCredentials([usernamePassword(credentialsId:'staging-prod', usernameVariable:'USERNAME', passwordVariable:'USERPASS' )]) {
+                    sshPublisher(
+                        failOnError: true,
+                        continueOnError: false,
+                        publishers:[
+                            sshPublisherDesc(
+                                configName: 'staging',
+                                sshCredentials: [
+                                username: "$USERNAME",
+                                encryptedPassphrase: "$USERPASS"
+                                ],
                             transfers: [
                                 sshTransfer(
-                                    sourceFiles: 'dist/trainSchedule.zip',
-                                    removePrefix: 'dist/',
-                                    removeDirectory: '/tmp',
-                                    execCommand: 'sudo /usr/bin/systemctl stop train-schedule && rm-rf /opt/train-schedule/* && unzip /tmp/trainSchedule.zip -d /opt/train-schedule && sudo /usr/bin/systemctl start train-schedule'                                    
+                                sourceFiles: 'dist/trainSchedule.zip',
+                                removePrefix: 'dist/',
+                                removeDirectory: '/tmp',
+                                execCommand: 'sudo /usr/bin/systemctl stop train-schedule && rm-rf /opt/train-schedule/* && unzip /tmp/trainSchedule.zip -d /opt/train-schedule && sudo /usr/bin/systemctl start train-schedule'                                    
                                 )
                             ]
-                        )
-                    ]
-                )
-
+                            )
+                        ]
+                    )
+                }
             }
         }
         stage('DeploytoProduction') {
@@ -45,29 +45,31 @@ pipeline {
             steps {
                 input 'Does staging look okay'
                 milestone(1)
-                withCredentials([usernamePassword(credentialsId: 'staging-prod', usernameVariable: 'USERNAME', passwordVariable: 'USERPASS' )])
-                sshPublisher(
-                    failOnError: true,
-                    continueOnError: false,
-                    publishers:[
-                        sshPublisherDesc(
-                            configName: 'Staging-Prod',
-                            sshCredentials: [
-                            username: "$USERNAME",
-                            encryptedPassphrase: "$USERPASS"
-                            ],
+                withCredentials([usernamePassword(credentialsId:'staging-prod', usernameVariable:'USERNAME', passwordVariable:'USERPASS' )]) {
+                    sshPublisher(
+                        failOnError: true,
+                        continueOnError: false,
+                        publishers:[
+                            sshPublisherDesc(
+                                configName: 'staging',
+                                sshCredentials: [
+                                username: "$USERNAME",
+                                encryptedPassphrase: "$USERPASS"
+                                ],
                             transfers: [
                                 sshTransfer(
-                                    sourceFiles: 'dist/trainSchedule.zip',
-                                    removePrefix: 'dist/',
-                                    removeDirectory: '/tmp',
-                                    execCommand: 'sudo /usr/bin/systemctl stop train-schedule && rm-rf /opt/train-schedule/* && unzip /tmp/trainSchedule.zip -d /opt/train-schedule && sudo /usr/bin/systemctl start train-schedule'                                    
+                                sourceFiles: 'dist/trainSchedule.zip',
+                                removePrefix: 'dist/',
+                                removeDirectory: '/tmp',
+                                execCommand: 'sudo /usr/bin/systemctl stop train-schedule && rm-rf /opt/train-schedule/* && unzip /tmp/trainSchedule.zip -d /opt/train-schedule && sudo /usr/bin/systemctl start train-schedule'                                    
                                 )
                             ]
-                        )
-                    ]
-                )
+                            )
+                        ]
+                    )
+                }
             }
-        }             
+        }
+                     
     }
 }
